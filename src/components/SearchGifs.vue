@@ -10,15 +10,18 @@
             </b-input-group-append>
         </b-input-group>
 
-        <div class="gif-container mt-4">
+        <div class="gif-container" :class="[gifs.length > 0 ? 'mt-4 mb-4' : '']">
             <ul>
                 <li v-for="gif in gifs" :key="gif.id">
                     <img :src="gif">
                 </li>
             </ul>
         </div>
+        <div class="text-center" v-if="isLoader">
+            <b-spinner variant="primary" label="Text Centered"></b-spinner>
+        </div>
         <base-button size="lg" theme="info" @click='showMore()' class="m-auto d-flex">Show More</base-button>
-        <p>{{ error }}</p>
+        <p v-if="error" class="text-danger text-center mt-2">{{ error }}</p>
     </b-container>
 </template>
 
@@ -32,7 +35,8 @@ export default {
             apiKey: "P8OxZ5mQFHsmPtzyuMwOv51nEABwyL0U",
             searchEndPoint: "https://api.giphy.com/v1/gifs/search?",
             limit: 5,
-            error: ''
+            error: '',
+            isLoader: false,
         };
     },
     methods: {
@@ -40,17 +44,21 @@ export default {
             let url = `${this.searchEndPoint}&api_key=${this.apiKey}&q=${
                 this.searchTerm
             }&limit=${this.limit}`;
+            this.isLoader = true;
             fetch(url)
                 .then(response => {
                     return response.json();
                 })
                 .then(json => {
                     this.buildGifs(json);
+                    console.log('json', json);
                 })
                 .catch(err => {
                     console.log(err);
+                })
+                .finally(() => {
+                    this.isLoader = false;
                 });
-            this.error = '';
             console.log(this.searchTerm);
         },
         buildGifs(json) {
@@ -59,13 +67,18 @@ export default {
                 .map(gifId => {
                     return `https://media.giphy.com/media/${gifId}/giphy.gif`;
             });
+            if (this.gifs.length === 0) {
+                return this.error = 'No results, change request please!';
+            }
+            return this.error = '';
         },
         showMore() {
-            if(this.gifs.length === 5) {
-                this.getGifs(this.limit += 5);
+            if(this.gifs.length > 0) {
+                this.getGifs(this.limit += this.limit);
             } else if (this && this.gifs.length === 0) {
                 return this.error = 'Need add Text and click on `Search` button!';
             }
+            return this.error = '';
         }
     },
 }
@@ -93,4 +106,5 @@ img {
     height: auto;
     max-width: 300px;
 }
+
 </style>
