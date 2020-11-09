@@ -13,7 +13,7 @@
         <div class="gif-container" :class="[gifs.length > 0 ? 'mt-4 mb-4' : '']">
             <ul>
                 <li v-for="gif in gifs" :key="gif.id">
-                    <img :src="gif.images.original.url" :alt="gif.url"/>
+                    <img :src="gif.url" :alt="gif.title"/>
                 </li>
             </ul>
         </div>
@@ -46,10 +46,7 @@ export default {
             this.isLoader = true;
             axiosInstance.get(`&api_key=${this.apiKey}&q=${this.searchTerm}&limit=${this.limit}`)
             .then(response => {
-                (
-                    this.gifs = response.data.data,
-                    console.log('then', this.gifs)
-                )
+                return this.buildGifs(response);
             })
             .catch(error => {
                 console.log(error);
@@ -57,6 +54,18 @@ export default {
             .finally(() => {
                 this.isLoader = false;
             });
+        },
+        buildGifs(response) {
+            this.gifs = response.data.data.map(gifs => {
+                return {
+                    title: gifs.title,
+                    url: gifs.images.original.url
+                };
+            });
+            if (this.gifs.length === 0) {
+                return this.error = 'No results, change request please!';
+            }
+            return this.error = '';
         },
         showMore() {
             console.log('limit', this.limit);
