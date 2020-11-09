@@ -22,12 +22,20 @@
         </div>
         <base-button size="lg" theme="info" @click='showMore()' class="m-auto d-flex">Show More</base-button>
         <p v-if="error" class="text-danger text-center mt-2">{{ error }}</p>
+        <br>
+        <br>
+        <blog-post :titleBool="false"></blog-post>
     </b-container>
 </template>
 
 <script>
+import BlogPost from '@/components/base/BlogPost.vue';
+
 export default {
     name: 'search-gifs',
+    components: {
+        BlogPost,
+    },
     data() {
         return {
             searchTerm: "",
