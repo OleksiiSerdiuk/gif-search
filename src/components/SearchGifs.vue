@@ -13,11 +13,14 @@
         <div class="gif-container" :class="[gifs.length > 0 ? 'mt-4 mb-4' : '']">
             <ul>
                 <li v-for="gif in gifs" :key="gif.id">
-                    <img :src="gif">
+                    <img
+                        :src="gif.url"
+                        :alt="gif.title"
+                    />
                 </li>
             </ul>
         </div>
-        <div class="text-center" v-if="isLoader">
+        <div class="text-center p-3" v-if="isLoader">
             <b-spinner variant="primary" label="Text Centered"></b-spinner>
         </div>
         <base-button size="lg" theme="info" @click='showMore()' class="m-auto d-flex">Show More</base-button>
@@ -51,7 +54,6 @@ export default {
                 })
                 .then(json => {
                     this.buildGifs(json);
-                    console.log('json', json);
                 })
                 .catch(err => {
                     console.log(err);
@@ -59,13 +61,13 @@ export default {
                 .finally(() => {
                     this.isLoader = false;
                 });
-            console.log(this.searchTerm);
         },
         buildGifs(json) {
-            this.gifs = json.data
-                .map(gif => gif.id)
-                .map(gifId => {
-                    return `https://media.giphy.com/media/${gifId}/giphy.gif`;
+            this.gifs = json.data.map(gifs => {
+                return {
+                    title: gifs.title,
+                    url: gifs.images.original.url
+                };
             });
             if (this.gifs.length === 0) {
                 return this.error = 'No results, change request please!';
@@ -74,7 +76,7 @@ export default {
         },
         showMore() {
             if(this.gifs.length > 0) {
-                this.getGifs(this.limit += this.limit);
+                this.getGifs(this.limit += 5);
             } else if (this && this.gifs.length === 0) {
                 return this.error = 'Need add Text and click on `Search` button!';
             }
