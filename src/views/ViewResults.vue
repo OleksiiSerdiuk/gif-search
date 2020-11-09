@@ -55,6 +55,12 @@ export default {
             })
             .finally(() => {
                 this.isLoader = false;
+
+                // added notification if there are no gifs
+                if (this.gifs.length === 0) {
+                    return this.error = 'No results, change request please!';
+                }
+                return this.error = '';
             });
         },
         showMore() {
