@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    <search-gifs />
+    <view-results />
   </div>
 </template>
 
 <script>
-import SearchGifs from '@/components/SearchGifs.vue';
+import ViewResults from '@/views/ViewResults.vue';
 
 export default {
   name: 'App',
   components: {
-      SearchGifs,
+      ViewResults,
   }
 }
 </script>

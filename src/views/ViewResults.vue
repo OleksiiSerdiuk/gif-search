@@ -3,21 +3,22 @@
         <b-card bg-variant="info" text-variant="white" header="Gif Searcher" class="text-center">
             <b-card-text>Find you favorite gifs</b-card-text>
         </b-card>
+
         <b-input-group class="mt-5">
-            <b-form-input v-model="searchTerm" placeholder="Enter your name"></b-form-input>
+            <base-input v-model="searchTerm" placeholder="Enter your name" />
             <b-input-group-append>
                 <base-button theme="info" @click='getGifs()'>Search</base-button>
             </b-input-group-append>
         </b-input-group>
-
         <div class="gif-container" :class="[gifs.length > 0 ? 'mt-4 mb-4' : '']">
             <ul>
                 <li v-for="gif in gifs" :key="gif.id">
-                    <img :src="gif">
+                    <img :src="gif.images.original.url" :alt="gif.url"/>
                 </li>
             </ul>
         </div>
-        <div class="text-center" v-if="isLoader">
+
+        <div class="text-center m-4" v-if="isLoader">
             <b-spinner variant="primary" label="Text Centered"></b-spinner>
         </div>
         <base-button size="lg" theme="info" @click='showMore()' class="m-auto d-flex">Show More</base-button>
@@ -26,55 +27,41 @@
 </template>
 
 <script>
+import axiosInstance from '@/api/index.js';
+
 export default {
-    name: 'search-gifs',
+    name: 'view-results',
     data() {
         return {
             searchTerm: "",
-            gifs: [],
             apiKey: "P8OxZ5mQFHsmPtzyuMwOv51nEABwyL0U",
-            searchEndPoint: "https://api.giphy.com/v1/gifs/search?",
             limit: 5,
+            gifs: [],
             error: '',
             isLoader: false,
         };
     },
     methods: {
         getGifs() {
-            let url = `${this.searchEndPoint}&api_key=${this.apiKey}&q=${
-                this.searchTerm
-            }&limit=${this.limit}`;
             this.isLoader = true;
-            fetch(url)
-                .then(response => {
-                    return response.json();
-                })
-                .then(json => {
-                    this.buildGifs(json);
-                    console.log('json', json);
-                })
-                .catch(err => {
-                    console.log(err);
-                })
-                .finally(() => {
-                    this.isLoader = false;
-                });
-            console.log(this.searchTerm);
-        },
-        buildGifs(json) {
-            this.gifs = json.data
-                .map(gif => gif.id)
-                .map(gifId => {
-                    return `https://media.giphy.com/media/${gifId}/giphy.gif`;
+            axiosInstance.get(`&api_key=${this.apiKey}&q=${this.searchTerm}&limit=${this.limit}`)
+            .then(response => {
+                (
+                    this.gifs = response.data.data,
+                    console.log('then', this.gifs)
+                )
+            })
+            .catch(error => {
+                console.log(error);
+            })
+            .finally(() => {
+                this.isLoader = false;
             });
-            if (this.gifs.length === 0) {
-                return this.error = 'No results, change request please!';
-            }
-            return this.error = '';
         },
         showMore() {
+            console.log('limit', this.limit);
             if(this.gifs.length > 0) {
-                this.getGifs(this.limit += this.limit);
+                this.getGifs(this.limit += 5);
             } else if (this && this.gifs.length === 0) {
                 return this.error = 'Need add Text and click on `Search` button!';
             }
@@ -106,5 +93,4 @@ img {
     height: auto;
     max-width: 300px;
 }
-
 </style>
