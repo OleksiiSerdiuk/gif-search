@@ -13,7 +13,7 @@
         <div class="gif-container" :class="[gifs.length > 0 ? 'mt-4 mb-4' : '']">
             <ul>
                 <li v-for="gif in gifs" :key="gif.id">
-                    <img :src="gif.images.original.url" :alt="gif.url"/>
+                    <img :src="gif.images.original.url" :alt="gif.title"/>
                 </li>
             </ul>
         </div>
@@ -47,8 +47,7 @@ export default {
             axiosInstance.get(`&api_key=${this.apiKey}&q=${this.searchTerm}&limit=${this.limit}`)
             .then(response => {
                 (
-                    this.gifs = response.data.data,
-                    console.log('then', this.gifs)
+                    this.gifs = response.data.data
                 )
             })
             .catch(error => {
@@ -59,7 +58,6 @@ export default {
             });
         },
         showMore() {
-            console.log('limit', this.limit);
             if(this.gifs.length > 0) {
                 this.getGifs(this.limit += 5);
             } else if (this && this.gifs.length === 0) {
