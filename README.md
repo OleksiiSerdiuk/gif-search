@@ -1,5 +1,10 @@
 # gif-searcher
 
+## Preparing
+```
+node v16
+```
+
 ## Project setup
 ```
 npm install
